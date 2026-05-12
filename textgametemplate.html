@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Python Game</title>
+  <title>Pyodide GitHub Loader</title>
 </head>
 <body>
-  <h1>Python Text Game</h1>
-
+  <h1>Python Game Loader TEMPLATE</h1>
   <button onclick="runGame()">Run Game</button>
+
   <pre id="output"></pre>
 
   <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
@@ -17,18 +17,23 @@
     async function runGame() {
       let pyodide = await pyodideReady;
 
-      let code = `
-print("Welcome to the guessing game!")
-import random
-num = random.randint(1, 5)
-guess = 3  # pretend user input
-print("You guessed:", guess)
-print("Number was:", num)
-print("Win!" if guess == num else "Try again!")
-      `;
+      // 🔥 load Python file from GitHub
+      let response = await fetch(
+        "https://raw.githubusercontent.com/USERNAME/REPO/main/game.py"
+      );
 
-      let result = pyodide.runPython(code);
-      document.getElementById("output").textContent = "Game ran!";
+      let pythonCode = await response.text();
+
+      // optional: redirect print output to browser
+      pyodide.runPython(`
+import sys
+class Output:
+    def write(self, s):
+        document.getElementById("output").textContent += s
+sys.stdout = Output()
+      `);
+
+      pyodide.runPython(pythonCode);
     }
   </script>
 </body>
